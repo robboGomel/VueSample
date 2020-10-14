@@ -9,7 +9,9 @@
             :last-name="person.last_name"
             :email="person.email">
     </Person>
-  <br><a :href="ad.url">{{ad.url}}</a>
+
+  <br><button @click="page--" v-if="page != 1">Prev</button><a :href="ad.url">{{ad.url}}</a>
+    <button @click="page++" v-if="page < totalPages">Next</button>
   </div>
 </template>
 
@@ -25,6 +27,8 @@ export default {
     return {
       regApi: new Reg(),
       personMass: [],
+      page: 1,
+      totalPages: 1,
       ad: {
         company: null,
         text: null,
@@ -34,17 +38,22 @@ export default {
   },
   methods: {
     getData: function () {
-      this.regApi.getData(1).then(data => {
+      this.regApi.getData(this.page).then(data => {
         this.ad.company = data.data.ad.company
         this.ad.text = data.data.ad.text
         this.ad.url = data.data.ad.url
         this.personMass = data.data.data
-        console.log(this.personMass)
+        this.totalPages = data.data.total_pages
       })
     }
   },
   created () {
     this.getData()
+  },
+  watch: {
+    page () {
+      this.getData()
+    }
   }
 }
 </script>
